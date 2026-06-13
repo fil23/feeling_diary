@@ -1,5 +1,7 @@
+import { LoginErrorAlert } from "@/components/alerts/loginAlerts";
 import { CustomButtons } from "@/components/buttons/customButton";
 import { useTheme } from "@/context/themeContext";
+import { useAuth } from "@/hooks/useAuth";
 import { ThemeColor } from "@/types/themecolor";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { Link } from "expo-router";
@@ -9,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const { theme } = useTheme();
+  const { err, login } = useAuth();
   const styles = customStyles(theme);
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
@@ -16,17 +19,25 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.main}>
+      {/*Pop up nel caso ci sia un errore nella login */}
+
+      {err ? <LoginErrorAlert /> : null}
       <View style={styles.cotainer}>
         <Text style={styles.title}>Welcome back!</Text>
         <TextInput
           placeholder="Email"
           textContentType="emailAddress"
-          maxLength={25}
+          maxLength={50}
           cursorColor={theme.text}
           placeholderTextColor={theme.text}
           style={styles.input}
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          className="email"
+          id="email"
+          autoComplete="email"
+          disableFullscreenUI={true}
         />
 
         <View style={styles.passwordContainer}>
@@ -40,18 +51,27 @@ export default function LoginScreen() {
             secureTextEntry={hide}
             value={pass}
             onChangeText={setPass}
+            returnKeyType="done"
+            className="password"
+            id="password"
+            autoComplete="password"
+            disableFullscreenUI={true}
           />
-          //TODO: Inserire icona all'interno del password input
+          {/* TODO: Inserire icona all'interno del password input */}
           <Pressable onPress={() => setHide(!hide)}>
             <Ionicons
               name={hide ? "eye-off-outline" : "eye-outline"}
-              size={30}
+              size={25}
               color={theme.text}
             />
           </Pressable>
         </View>
 
-        <CustomButtons theme={theme} textButton="Login" />
+        <CustomButtons
+          theme={theme}
+          textButton="Login"
+          onPressAction={() => login(email, pass)}
+        />
         <Link href="/(auth)/signin" style={styles.link}>
           Don't you have an account yet?
         </Link>
@@ -91,11 +111,11 @@ const customStyles = (theme: ThemeColor) =>
       borderWidth: 2,
       borderColor: theme.border,
       color: theme.text,
-      height: 40,
+      height: 45,
       borderRadius: 10,
       paddingLeft: 5,
       fontFamily: "Pixelify-Regular",
-      fontSize: 17,
+      fontSize: 20,
       width: "100%",
     },
     passwordContainer: {

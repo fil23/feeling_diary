@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "alone",
+    "icon": "./assets/images/icon_alone.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
@@ -34,7 +35,8 @@
         }
       ],
       "expo-font",
-      "@react-native-vector-icons/ionicons"
+      "@react-native-vector-icons/ionicons",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

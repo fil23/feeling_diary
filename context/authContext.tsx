@@ -1,10 +1,14 @@
-import { User } from "@/types/user";
+import { supabase } from "@/utils/supabase";
+import { User } from "@supabase/supabase-js";
+import * as SecureStore from "expo-secure-store";
 import { createContext, ReactNode, useState } from "react";
 
 interface AuthContextType {
   user: User | null;
   login: (name: string, pass: string) => void;
   logout: () => void;
+  loadUser: (t: string) => void;
+  err: string | null;
 }
 
 interface Props {
@@ -15,15 +19,78 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
-  const login = (name: string, password: string) => {
-    null;
+  // Login with email and password
+  const login = async (name: string, password: string) => {
+    try {
+      // Call supabase api to take user
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: name,
+        password: password,
+      });
+
+      if (error != null || data.user === null) {
+        setErr("Sorry, I haven't find you!");
+        return;
+      }
+
+      // set user in the app's context
+      setUser(data.user);
+
+      // save the token for future access
+      const t = data.session?.access_token;
+
+      if (data.session === null) {
+        setErr("I didn't find any session!");
+        return;
+      }
+
+      await SecureStore.setItemAsync(
+        process.env.EXPO_PUBLIC_TOKEN_NAME!,
+        t ?? "none",
+      );
+    } catch (e: any) {
+      setErr(e.message);
+      console.error("Error:" + e.message);
+      return;
+    }
   };
 
-  const logout = () => {};
+  // Logout function
+  const logout = async () => {
+    setUser(null);
+    await SecureStore.deleteItemAsync(process.env.EXPO_PUBLIC_TOKEN_NAME!);
+  };
+
+  const loadUser = async () => {
+    const token = await SecureStore.getItemAsync(
+      process.env.EXPO_PUBLIC_TOKEN_NAME!,
+    );
+
+    if (token === null) {
+      console.error("I havn't found any token");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.auth.getUser(token);
+
+      if (error != null || data.user === null) {
+        setErr("Ooops... There is something wrong here!");
+      }
+
+      setUser(data.user);
+      console.info("User has been loaded correctly!");
+    } catch (error: any) {
+      setErr(error.message);
+      console.error("Error:" + error.message);
+      return;
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, err, loadUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -10,6 +10,7 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     "Pixelify-Regular": require("../assets/fonts/PixelifySans-Regular.ttf"),
     "Pixelify-Bold": require("../assets/fonts/PixelifySans-Bold.ttf"),
+    Inter: require("../assets/fonts/Inter-VariableFont.ttf"),
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 

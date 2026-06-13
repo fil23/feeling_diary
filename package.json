@@ -2,6 +2,7 @@
   "name": "alone",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "icon": "./assets/images/icon_alone.png",
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-vector-icons/codemod": "^13.2.1",
@@ -13,6 +14,7 @@
     "expo-font": "~56.0.6",
     "expo-linking": "~56.0.14",
     "expo-router": "~56.2.10",
+    "expo-secure-store": "~56.0.4",
     "expo-splash-screen": "~56.0.10",
     "expo-status-bar": "~56.0.4",
     "expo-symbols": "~56.0.6",

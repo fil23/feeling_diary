@@ -10,6 +10,7 @@ export default {
     tabIconDefault: "#444444",
     tabIconSelected: "#000000",
     shadow: "#535353a6",
+    error: "#b60000",
   },
   dark: {
     text: "#ffffff",
@@ -22,5 +23,6 @@ export default {
     tabIconDefault: "#bbbbbb",
     tabIconSelected: "#ffffff",
     shadow: "#c9c9c9a8",
+    error: "#b60000",
   },
 };

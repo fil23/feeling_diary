@@ -9,4 +9,5 @@ export type ThemeColor = {
   tabIconDefault: string;
   tabIconSelected: string;
   shadow: string;
+  error: string;
 };
