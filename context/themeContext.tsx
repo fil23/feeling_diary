@@ -1,18 +1,13 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useColorScheme } from "react-native";
 import Colors from "../constants/Colors";
-
-type ThemeColor = {
-  text: string;
-  background: string;
-  primary: string;
-  secondary: string;
-  border: string;
-  muted: string;
-  tint: string;
-  tabIconDefault: string;
-  tabIconSelected: string;
-};
+import type { ThemeColor } from "../types/themecolor";
 
 type ThemeContextType = {
   colorScheme: "light" | "dark";
@@ -30,7 +25,7 @@ export const ThemeContext = createContext<ThemeContextType | null>(null);
 export const ThemeProvider = ({ children }: Props) => {
   const systemScheme = useColorScheme();
   const [colorScheme, setColorSchemeState] = useState<"light" | "dark">(
-    systemScheme === "dark" ? "dark" : "light"
+    systemScheme === "dark" ? "dark" : "light",
   );
 
   useEffect(() => {

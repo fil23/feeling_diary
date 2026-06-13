@@ -8,5 +8,5 @@ export default function Index() {
     return <Redirect href={"/(auth)/login"} />;
   }
 
-  return <Redirect href={"/(app)/index"} />;
+  return <Redirect href={"/(app)"} />;
 }

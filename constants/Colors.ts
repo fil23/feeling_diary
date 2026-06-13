@@ -9,6 +9,7 @@ export default {
     tint: "#000000",
     tabIconDefault: "#444444",
     tabIconSelected: "#000000",
+    shadow: "#535353a6",
   },
   dark: {
     text: "#ffffff",
@@ -20,5 +21,6 @@ export default {
     tint: "#ffffff",
     tabIconDefault: "#bbbbbb",
     tabIconSelected: "#ffffff",
+    shadow: "#c9c9c9a8",
   },
 };
