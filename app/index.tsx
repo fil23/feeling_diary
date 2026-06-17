@@ -1,16 +1,41 @@
+import { CustomCircularProgress } from "@/components/circular_progress_lading";
 import { useAuth } from "@/hooks/useAuth";
 import { Redirect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
 
 export default function Index() {
-  const { loadUser } = useAuth();
-  const token = async function getToken() {
-    return await SecureStore.getItemAsync(process.env.EXPO_PUBLIC_TOKEN_NAME!);
-  };
+  const { loadUser, setExistToken, existToken } = useAuth();
+  const [loading, setLoading] = useState<boolean>(false);
 
-  if (token === null) {
-    return <Redirect href={"/(auth)/login"} />;
+  useEffect(() => {
+    async function getToken() {
+      setLoading(true);
+      const t = await SecureStore.getItemAsync(
+        process.env.EXPO_PUBLIC_TOKEN_NAME!,
+      );
+      setLoading(false);
+      setExistToken(!!t);
+    }
+
+    async function deleteT() {
+      await SecureStore.deleteItemAsync(process.env.EXPO_PUBLIC_TOKEN_NAME!);
+      setExistToken(false);
+    }
+
+    getToken();
+    deleteT();
+  }, []);
+
+  {
+    loading && <CustomCircularProgress />;
   }
-  loadUser(token.toString());
-  return <Redirect href={"/(app)"} />;
+  if (existToken) {
+    setExistToken(true);
+    loadUser();
+    return <Redirect href={"/(app)"} />;
+  }
+
+  setExistToken(false);
+  return <Redirect href={"/(auth)/login"} />;
 }

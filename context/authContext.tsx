@@ -7,8 +7,10 @@ interface AuthContextType {
   user: User | null;
   login: (name: string, pass: string) => void;
   logout: () => void;
-  loadUser: (t: string) => void;
+  loadUser: () => void;
   err: string | null;
+  existToken: boolean;
+  setExistToken: (e: boolean) => void;
 }
 
 interface Props {
@@ -20,6 +22,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [existToken, setExistToken] = useState<boolean>(false);
 
   // Login with email and password
   const login = async (name: string, password: string) => {
@@ -89,8 +92,18 @@ export const AuthProvider = ({ children }: Props) => {
     }
   };
 
+  const existT = async () => {
+    const t = await SecureStore.getItemAsync(
+      process.env.EXPO_PUBLIC_TOKEN_NAME!,
+    );
+    if (t === null) return setExistToken(false);
+    return setExistToken(true);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, err, loadUser }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, err, loadUser, existToken, setExistToken }}
+    >
       {children}
     </AuthContext.Provider>
   );

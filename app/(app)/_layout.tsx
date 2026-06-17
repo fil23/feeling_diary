@@ -2,11 +2,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { Redirect, Stack } from "expo-router";
 
 export default function PrivateLayout() {
-  const auth = useAuth();
+  const { existToken, setExistToken } = useAuth();
 
-  if (!auth.user) {
+  if (!existToken) {
     return <Redirect href="/(auth)/login" />;
   }
 
   return <Stack />;
-};
+}

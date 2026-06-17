@@ -1,12 +1,12 @@
 import { LoginErrorAlert } from "@/components/alerts/loginAlerts";
 import { CustomButtons } from "@/components/buttons/customButton";
+import { CustomPasswordInput } from "@/components/inputs/customPasswordInputs";
 import { useTheme } from "@/context/themeContext";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeColor } from "@/types/themecolor";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
@@ -27,6 +27,7 @@ export default function LoginScreen() {
         <TextInput
           placeholder="Email"
           textContentType="emailAddress"
+          inputMode="email"
           maxLength={50}
           cursorColor={theme.text}
           placeholderTextColor={theme.text}
@@ -40,33 +41,12 @@ export default function LoginScreen() {
           disableFullscreenUI={true}
         />
 
-        <View style={styles.passwordContainer}>
-          <TextInput
-            placeholder="Password"
-            textContentType="password"
-            maxLength={25}
-            cursorColor={theme.text}
-            placeholderTextColor={theme.text}
-            style={[styles.input, { borderWidth: 0, width: "90%" }]}
-            secureTextEntry={hide}
-            value={pass}
-            onChangeText={setPass}
-            returnKeyType="done"
-            className="password"
-            id="password"
-            autoComplete="password"
-            disableFullscreenUI={true}
-          />
-          {/* TODO: Inserire icona all'interno del password input */}
-          <Pressable onPress={() => setHide(!hide)}>
-            <Ionicons
-              name={hide ? "eye-off-outline" : "eye-outline"}
-              size={25}
-              color={theme.text}
-            />
-          </Pressable>
-        </View>
-
+        <CustomPasswordInput
+          pass={pass}
+          setPass={setPass}
+          hide={hide}
+          setHide={setHide}
+        />
         <CustomButtons
           theme={theme}
           textButton="Login"
@@ -97,15 +77,10 @@ const customStyles = (theme: ThemeColor) =>
 
     title: {
       color: theme.text,
-      fontFamily: "Pixelify-Regular",
+      fontFamily: "Pixelify-Bold",
       fontSize: 45,
       textAlign: "center",
       marginVertical: "10%",
-      textShadowColor: theme.shadow,
-      textShadowOffset: {
-        height: 2,
-        width: 1,
-      },
     },
     input: {
       borderWidth: 2,
@@ -118,16 +93,7 @@ const customStyles = (theme: ThemeColor) =>
       fontSize: 20,
       width: "100%",
     },
-    passwordContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      borderWidth: 2,
-      borderColor: theme.text,
-      height: 40,
-      marginVertical: "10%",
-      borderRadius: 10,
-      paddingRight: "2%",
-    },
+
     link: {
       color: theme.text,
       fontFamily: "Pixelify-Regular",
