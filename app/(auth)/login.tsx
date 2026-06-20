@@ -6,12 +6,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { ThemeColor } from "@/types/themecolor";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const { theme } = useTheme();
-  const { err, login } = useAuth();
+  const { err, login, loading } = useAuth();
   const styles = customStyles(theme);
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
@@ -22,7 +23,11 @@ export default function LoginScreen() {
       {/*Pop up nel caso ci sia un errore nella login */}
 
       {err ? <LoginErrorAlert /> : null}
-      <View style={styles.cotainer}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.cotainer}
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={24}
+      >
         <Text style={styles.title}>Welcome back!</Text>
         <TextInput
           placeholder="Email"
@@ -30,7 +35,7 @@ export default function LoginScreen() {
           inputMode="email"
           maxLength={50}
           cursorColor={theme.text}
-          placeholderTextColor={theme.text}
+          placeholderTextColor={theme.placeholder}
           style={styles.input}
           value={email}
           onChangeText={setEmail}
@@ -51,11 +56,12 @@ export default function LoginScreen() {
           theme={theme}
           textButton="Login"
           onPressAction={() => login(email, pass)}
+          disabled={loading || (email === "" && pass === "")}
         />
         <Link href="/(auth)/signin" style={styles.link}>
           Don't you have an account yet?
         </Link>
-      </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }
@@ -65,9 +71,8 @@ const customStyles = (theme: ThemeColor) =>
     cotainer: {
       // borderColor: theme.border,
       // borderWidth: 1,
-      width: "80%",
+      marginHorizontal: "5%",
       height: "75%",
-      justifyContent: "center",
     },
     main: {
       flex: 1,

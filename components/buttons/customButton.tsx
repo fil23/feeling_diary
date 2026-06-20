@@ -11,14 +11,20 @@ interface Props {
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   onPressAction: () => void;
+  disabled?: boolean;
 }
 
 export const CustomButtons = (props: Props) => {
   const styles = customStyles(props.theme);
   return (
     <Pressable
-      style={[styles.buttonContainer, props.style]}
+      style={[
+        styles.buttonContainer,
+        props.style,
+        props.disabled && styles.disable,
+      ]}
       onPress={props.onPressAction}
+      disabled={props.disabled === null ? false : props.disabled}
     >
       <Text style={[props.textStyle, styles.buttonText]}>
         {props.textButton}
@@ -31,7 +37,7 @@ const customStyles = (theme: ThemeColor) =>
   StyleSheet.create({
     buttonContainer: {
       backgroundColor: theme.primary,
-      width: "50%",
+      width: "100%",
       justifyContent: "center",
       borderRadius: 30,
       alignItems: "center",
@@ -42,6 +48,12 @@ const customStyles = (theme: ThemeColor) =>
 
     buttonText: {
       fontFamily: "Pixelify-Bold",
+      color: theme.background,
       fontSize: 20,
+    },
+
+    disable: {
+      opacity: 0.5,
+      backgroundColor: theme.placeholder,
     },
   });

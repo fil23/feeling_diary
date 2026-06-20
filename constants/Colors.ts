@@ -11,6 +11,7 @@ export default {
     tabIconSelected: "#000000",
     shadow: "#535353a6",
     error: "#b60000",
+    placeholder: "#58585894",
   },
   dark: {
     text: "#ffffff",
@@ -24,5 +25,6 @@ export default {
     tabIconSelected: "#ffffff",
     shadow: "#c9c9c9a8",
     error: "#b60000",
+    placeholder: "#c4c4c4ce",
   },
 };

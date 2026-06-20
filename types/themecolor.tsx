@@ -10,4 +10,5 @@ export type ThemeColor = {
   tabIconSelected: string;
   shadow: string;
   error: string;
+  placeholder: string;
 };

@@ -2,12 +2,12 @@ import { useTheme } from "@/context/themeContext";
 import { ThemeColor } from "@/types/themecolor";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
-    Pressable,
-    StyleProp,
-    StyleSheet,
-    TextInput,
-    View,
-    ViewStyle,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  TextInput,
+  View,
+  ViewStyle,
 } from "react-native";
 
 interface Props {
@@ -16,6 +16,7 @@ interface Props {
   hide: boolean;
   setHide: (h: boolean) => void;
   style?: StyleProp<ViewStyle>;
+  text?: string;
 }
 
 export const CustomPasswordInput = (props: Props) => {
@@ -25,11 +26,11 @@ export const CustomPasswordInput = (props: Props) => {
   return (
     <View style={[styles.passwordContainer, props.style]}>
       <TextInput
-        placeholder="Password"
+        placeholder={props.text ?? "Password..."}
         textContentType="password"
         maxLength={25}
         cursorColor={theme.text}
-        placeholderTextColor={theme.text}
+        placeholderTextColor={theme.placeholder}
         style={[styles.input, { borderWidth: 0, width: "90%" }]}
         secureTextEntry={props.hide}
         value={props.pass}
@@ -62,7 +63,7 @@ const customStyle = (theme: ThemeColor) =>
       borderRadius: 10,
       paddingLeft: 5,
       fontFamily: "Pixelify-Regular",
-      fontSize: 20,
+      fontSize: 17,
       width: "100%",
     },
     passwordContainer: {
@@ -70,7 +71,7 @@ const customStyle = (theme: ThemeColor) =>
       alignItems: "center",
       borderWidth: 2,
       borderColor: theme.text,
-      marginVertical: "10%",
+      marginTop: "10%",
       borderRadius: 10,
       paddingRight: "2%",
     },

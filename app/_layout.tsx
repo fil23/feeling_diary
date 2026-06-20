@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/context/themeContext";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,10 +27,12 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </ThemeProvider>
-    </AuthProvider>
+    <KeyboardProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </ThemeProvider>
+      </AuthProvider>
+    </KeyboardProvider>
   );
 }

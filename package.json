@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@expo/metro-runtime": "~56.0.15",
     "@expo/ui": "~56.0.18",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-vector-icons/codemod": "^13.2.1",
@@ -22,8 +23,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.85.3",
-    "react-native-async-storage": "^0.0.1",
-    "react-native-config": "^1.6.1",
+    "react-native-keyboard-controller": "1.21.6",
     "react-native-reanimated": "4.3.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
