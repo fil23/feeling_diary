@@ -11,4 +11,5 @@ export type ThemeColor = {
   shadow: string;
   error: string;
   placeholder: string;
+  backgroundTab: string;
 };

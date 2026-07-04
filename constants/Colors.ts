@@ -12,6 +12,7 @@ export default {
     shadow: "#535353a6",
     error: "#b60000",
     placeholder: "#58585894",
+    backgroundTab: "#e9e9e9",
   },
   dark: {
     text: "#ffffff",
@@ -26,5 +27,6 @@ export default {
     shadow: "#c9c9c9a8",
     error: "#b60000",
     placeholder: "#c4c4c4ce",
+    backgroundTab: "#0e0e0e",
   },
 };

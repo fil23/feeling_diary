@@ -48,7 +48,7 @@ const customStyles = (theme: ThemeColor) =>
 
     buttonText: {
       fontFamily: "Pixelify-Bold",
-      color: theme.background,
+
       fontSize: 20,
     },
 

@@ -1,8 +1,12 @@
 import { supabase } from "@/utils/supabase";
 import { User } from "@supabase/supabase-js";
+import { makeRedirectUri } from "expo-auth-session";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import * as WebBrowser from "expo-web-browser";
 import { createContext, ReactNode, useState } from "react";
+
+WebBrowser.maybeCompleteAuthSession();
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +14,7 @@ interface AuthContextType {
   logout: () => void;
   loadUser: () => void;
   signIn: (email: string, password: string) => void;
+  signInWithGoogle: () => void;
   err: string | null;
   existToken: boolean;
   setExistToken: (e: boolean) => void;
@@ -24,11 +29,38 @@ interface Props {
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
+const getAuthTokensFromUrl = (url: string) => {
+  const [, queryString] = url.split("?");
+  const [, fragmentString] = url.split("#");
+  const params = new URLSearchParams(queryString ?? "");
+  const fragmentParams = new URLSearchParams(fragmentString ?? "");
+
+  fragmentParams.forEach((value, key) => {
+    params.set(key, value);
+  });
+
+  return {
+    accessToken: params.get("access_token"),
+    refreshToken: params.get("refresh_token"),
+    authCode: params.get("code"),
+  };
+};
+
 export const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [existToken, setExistToken] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const completeLogin = async (sessionUser: User, accessToken: string) => {
+    await SecureStore.setItemAsync(
+      process.env.EXPO_PUBLIC_TOKEN_NAME!,
+      accessToken,
+    );
+    setUser(sessionUser);
+    setExistToken(true);
+    router.replace("/(app)/home");
+  };
 
   // Login with email and password
   const login = async (name: string, password: string) => {
@@ -53,7 +85,7 @@ export const AuthProvider = ({ children }: Props) => {
 
       if (data.session === null) {
         setErr("I didn't find any session!");
-        return;
+        throw error;
       }
 
       await SecureStore.setItemAsync(
@@ -126,15 +158,91 @@ export const AuthProvider = ({ children }: Props) => {
 
       if (data === null || error != null) {
         setErr("Sorry something went wrong!! Try again later");
-        console.error("Data null or error during sign in" + error?.message);
-        setLoading(false);
-        return;
+        throw error;
       }
       //se user for app context
       setUser(data.user);
     } catch (e: any) {
       setErr("Something went wrong!!");
       console.error("Error during sign in: " + e.message);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    const redirectTo = makeRedirectUri({
+      scheme: "alone",
+      path: "callback",
+    });
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectTo,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error) {
+        setErr("Error during google sign in");
+        throw error;
+      }
+
+      if (data.url) {
+        const result = await WebBrowser.openAuthSessionAsync(
+          data.url,
+          redirectTo,
+        );
+
+        if (result.type === "success") {
+          const { accessToken, refreshToken, authCode } = getAuthTokensFromUrl(
+            result.url,
+          );
+
+          if (authCode) {
+            const { data: sessionData, error: sessionError } =
+              await supabase.auth.exchangeCodeForSession(authCode);
+
+            if (sessionError || !sessionData.session) {
+              setErr("Error during google sign in");
+              throw sessionError;
+            }
+
+            await completeLogin(
+              sessionData.session.user,
+              sessionData.session.access_token,
+            );
+            return;
+          }
+
+          if (!accessToken || !refreshToken) {
+            setErr("Google sign in didn't return a valid session");
+            return;
+          }
+
+          const { data: sessionData, error: sessionError } =
+            await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+
+          if (sessionError || !sessionData.session) {
+            setErr("Error during google sign in");
+            throw sessionError;
+          }
+
+          await completeLogin(
+            sessionData.session.user,
+            sessionData.session.access_token,
+          );
+        }
+      }
+    } catch (e: any) {
+      setErr("Error during google sign in");
+      console.error("Error during google sign in:" + e.message);
       return;
     } finally {
       setLoading(false);
@@ -150,10 +258,8 @@ export const AuthProvider = ({ children }: Props) => {
       } = await supabase.auth.getSession();
 
       if (session?.user.email_confirmed_at) {
-        const t = session.access_token;
-        await SecureStore.setItemAsync(process.env.EXPO_PUBLIC_TOKEN_NAME!, t);
+        await completeLogin(session.user, session.access_token);
         setLoading(false);
-        router.replace("/(app)");
       } else {
         setLoading(false);
         router.replace("/(auth)/login");
@@ -173,6 +279,7 @@ export const AuthProvider = ({ children }: Props) => {
         login,
         logout,
         signIn,
+        signInWithGoogle,
         err,
         loadUser,
         existToken,

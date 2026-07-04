@@ -6,7 +6,7 @@ export default function AuthLayout() {
   const { existToken } = useAuth();
 
   if (existToken) {
-    return <Redirect href="/(app)" />;
+    return <Redirect href="/(app)/home" />;
   }
 
   return <CustomHeader />;

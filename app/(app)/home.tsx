@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function HomeScreen() {
+export default function Home() {
   const { theme } = useTheme();
   const styles = customStyles(theme);
   const { user, logout } = useAuth();

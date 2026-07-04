@@ -36,7 +36,7 @@ export default function Index() {
   if (existToken) {
     setExistToken(true);
     loadUser();
-    return <Redirect href={"/(app)"} />;
+    return <Redirect href={"/(app)/home"} />;
   }
 
   return <Redirect href={"/(auth)/login"} />;
