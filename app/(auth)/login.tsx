@@ -25,7 +25,7 @@ export default function LoginScreen() {
       {loading === true ? (
         <CircularProgressIndicator />
       ) : err ? (
-        <LoginErrorAlert />
+        <LoginErrorAlert message={err} />
       ) : (
         <KeyboardAwareScrollView
           contentContainerStyle={styles.cotainer}

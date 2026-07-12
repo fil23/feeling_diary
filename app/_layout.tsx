@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/context/authContext";
+import { GraphProvider } from "@/context/graphsContext";
 import { ThemeProvider } from "@/context/themeContext";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
@@ -29,9 +30,11 @@ export default function RootLayout() {
   return (
     <KeyboardProvider>
       <AuthProvider>
-        <ThemeProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-        </ThemeProvider>
+        <GraphProvider>
+          <ThemeProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+          </ThemeProvider>
+        </GraphProvider>
       </AuthProvider>
     </KeyboardProvider>
   );

@@ -1,17 +1,20 @@
+import CustomCircularProgress from "@/components/circular_progress_lading";
 import { useTheme } from "@/context/themeContext";
 import { useAuth } from "@/hooks/useAuth";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { Redirect, Tabs } from "expo-router";
 
 export default function PrivateLayout() {
-  const { existToken } = useAuth();
+  const { user, loading } = useAuth();
   const { theme } = useTheme();
 
-  if (!existToken) {
+  if (!user) {
     return <Redirect href="/(auth)/login" />;
   }
 
-  return (
+  return loading ? (
+    <CustomCircularProgress />
+  ) : (
     <Tabs
       screenOptions={{
         headerStyle: {
@@ -34,7 +37,7 @@ export default function PrivateLayout() {
         },
         tabBarAllowFontScaling: true,
         tabBarLabelStyle: {
-          fontFamily: "Pixelify-Regular",
+          fontFamily: "SpaceMono",
         },
       }}
     >

@@ -7,8 +7,10 @@
     "scheme": "alone",
     "icon": "./assets/images/icon_alone.png",
     "userInterfaceStyle": "automatic",
+    "jsEngine": "hermes",
     "ios": {
       "supportsTablet": true,
+      "jsEngine": "jsc",
       "bundleIdentifier": "com.pippo123.alone",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -47,6 +49,12 @@
       "eas": {
         "projectId": "42c1b2da-cce9-43c2-9eda-81d2ef2826f6"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/42c1b2da-cce9-43c2-9eda-81d2ef2826f6"
     }
   }
 }

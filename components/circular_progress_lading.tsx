@@ -1,20 +1,22 @@
 import { useTheme } from "@/context/themeContext";
 import { ThemeColor } from "@/types/themecolor";
-import { CircularProgressIndicator, Host } from "@expo/ui/jetpack-compose";
+import { Host, ProgressView, Text } from "@expo/ui/swift-ui";
 import { StyleSheet, View } from "react-native";
 
-export const CustomCircularProgress = () => {
+export default function CustomCircularProgress() {
   const { theme } = useTheme();
   const styles = customStyle(theme);
 
   return (
     <View style={styles.container}>
       <Host matchContents>
-        <CircularProgressIndicator />
+        <ProgressView>
+          <Text>Loading...</Text>
+        </ProgressView>
       </Host>
     </View>
   );
-};
+}
 
 const customStyle = (theme: ThemeColor) =>
   StyleSheet.create({

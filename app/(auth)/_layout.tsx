@@ -1,13 +1,14 @@
+import CustomCircularProgress from "@/components/circular_progress_lading";
 import { CustomHeader } from "@/components/header";
 import { useAuth } from "@/hooks/useAuth";
 import { Redirect } from "expo-router";
 
 export default function AuthLayout() {
-  const { existToken } = useAuth();
+  const { loading, user } = useAuth();
 
-  if (existToken) {
+  if (user) {
     return <Redirect href="/(app)/home" />;
   }
 
-  return <CustomHeader />;
+  return loading ? <CustomCircularProgress /> : <CustomHeader />;
 }

@@ -1,17 +1,18 @@
 import { useTheme } from "@/context/themeContext";
-import { useAuth } from "@/hooks/useAuth";
 import { ThemeColor } from "@/types/themecolor";
 import { StyleSheet, Text, View } from "react-native";
 
-export const LoginErrorAlert = () => {
-  const { err } = useAuth();
+interface Props {
+  message: string;
+}
+export const LoginErrorAlert = (props: Props) => {
   const { theme } = useTheme();
   const styles = customstyle(theme);
 
   return (
     <View style={styles.errorContainer}>
       <Text style={styles.title}>Error:</Text>
-      <Text style={styles.errorText}>{err}</Text>
+      <Text style={styles.errorText}>{props.message}</Text>
     </View>
   );
 };

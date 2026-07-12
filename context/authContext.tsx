@@ -1,10 +1,8 @@
 import { supabase } from "@/utils/supabase";
-import { User } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
-import { router } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -12,15 +10,11 @@ interface AuthContextType {
   user: User | null;
   login: (name: string, pass: string) => void;
   logout: () => void;
-  loadUser: () => void;
   signIn: (email: string, password: string) => void;
   signInWithGoogle: () => void;
   err: string | null;
-  existToken: boolean;
-  setExistToken: (e: boolean) => void;
   loading: boolean;
   setLoading: (l: boolean) => void;
-  completeAuth: () => void;
 }
 
 interface Props {
@@ -47,20 +41,31 @@ const getAuthTokensFromUrl = (url: string) => {
 };
 
 export const AuthProvider = ({ children }: Props) => {
+  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [existToken, setExistToken] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const completeLogin = async (sessionUser: User, accessToken: string) => {
-    await SecureStore.setItemAsync(
-      process.env.EXPO_PUBLIC_TOKEN_NAME!,
-      accessToken,
-    );
-    setUser(sessionUser);
-    setExistToken(true);
-    router.replace("/(app)/home");
-  };
+  useEffect(() => {
+    setLoading(true);
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Login with email and password
   const login = async (name: string, password: string) => {
@@ -76,22 +81,6 @@ export const AuthProvider = ({ children }: Props) => {
         setErr("Sorry, I haven't find you!");
         return;
       }
-
-      // set user in the app's context
-      setUser(data.user);
-
-      // save the token for future access
-      const t = data.session?.access_token;
-
-      if (data.session === null) {
-        setErr("I didn't find any session!");
-        throw error;
-      }
-
-      await SecureStore.setItemAsync(
-        process.env.EXPO_PUBLIC_TOKEN_NAME!,
-        t ?? "none",
-      );
     } catch (e: any) {
       setErr(e.message);
       console.error("Error:" + e.message);
@@ -103,48 +92,7 @@ export const AuthProvider = ({ children }: Props) => {
 
   // Logout function
   const logout = async () => {
-    setLoading(true);
-    setUser(null);
-    await SecureStore.deleteItemAsync(process.env.EXPO_PUBLIC_TOKEN_NAME!);
-    setLoading(false);
-  };
-
-  const loadUser = async () => {
-    setLoading(true);
-    const token = await SecureStore.getItemAsync(
-      process.env.EXPO_PUBLIC_TOKEN_NAME!,
-    );
-
-    if (token === null) {
-      console.error("I havn't found any token");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.auth.getUser(token);
-
-      if (error != null || data.user === null) {
-        setErr("Ooops... There is something wrong here!");
-      }
-
-      setUser(data.user);
-      console.info("User has been loaded correctly!");
-    } catch (error: any) {
-      setErr(error.message);
-      console.error("Error:" + error.message);
-      return;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const existT = async () => {
-    const t = await SecureStore.getItemAsync(
-      process.env.EXPO_PUBLIC_TOKEN_NAME!,
-    );
-    if (t === null) return setExistToken(false);
-    return setExistToken(true);
+    await supabase.auth.signOut();
   };
 
   const signIn = async (email: string, password: string) => {
@@ -160,8 +108,6 @@ export const AuthProvider = ({ children }: Props) => {
         setErr("Sorry something went wrong!! Try again later");
         throw error;
       }
-      //se user for app context
-      setUser(data.user);
     } catch (e: any) {
       setErr("Something went wrong!!");
       console.error("Error during sign in: " + e.message);
@@ -182,7 +128,7 @@ export const AuthProvider = ({ children }: Props) => {
         provider: "google",
         options: {
           redirectTo: redirectTo,
-          skipBrowserRedirect: true,
+          skipBrowserRedirect: false,
         },
       });
 
@@ -210,11 +156,6 @@ export const AuthProvider = ({ children }: Props) => {
               setErr("Error during google sign in");
               throw sessionError;
             }
-
-            await completeLogin(
-              sessionData.session.user,
-              sessionData.session.access_token,
-            );
             return;
           }
 
@@ -233,11 +174,6 @@ export const AuthProvider = ({ children }: Props) => {
             setErr("Error during google sign in");
             throw sessionError;
           }
-
-          await completeLogin(
-            sessionData.session.user,
-            sessionData.session.access_token,
-          );
         }
       }
     } catch (e: any) {
@@ -249,29 +185,6 @@ export const AuthProvider = ({ children }: Props) => {
     }
   };
 
-  const completeAuth = async () => {
-    setLoading(true);
-    try {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-
-      if (session?.user.email_confirmed_at) {
-        await completeLogin(session.user, session.access_token);
-        setLoading(false);
-      } else {
-        setLoading(false);
-        router.replace("/(auth)/login");
-      }
-    } catch (e: any) {
-      setErr("Somthing went wrong!");
-      console.error("Token didn't save: " + e.message);
-      return;
-    } finally {
-      setLoading(false);
-    }
-  };
   return (
     <AuthContext.Provider
       value={{
@@ -281,12 +194,8 @@ export const AuthProvider = ({ children }: Props) => {
         signIn,
         signInWithGoogle,
         err,
-        loadUser,
-        existToken,
-        setExistToken,
         loading,
         setLoading,
-        completeAuth,
       }}
     >
       {children}
