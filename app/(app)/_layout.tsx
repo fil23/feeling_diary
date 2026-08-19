@@ -40,6 +40,7 @@ export default function PrivateLayout() {
           fontFamily: "SpaceMono",
         },
       }}
+      initialRouteName="home"
     >
       <Tabs.Screen
         name="graphics"
@@ -61,6 +62,19 @@ export default function PrivateLayout() {
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="add"
+        options={{
+          title: "New Mood",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "add" : "add-outline"}
               color={color}
               size={size}
             />
