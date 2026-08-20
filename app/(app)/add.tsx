@@ -1,28 +1,55 @@
+import { saveComment, saveMood } from "@/api/feelings_api";
 import { CustomButtons } from "@/components/buttons/customButton";
 import { useTheme } from "@/context/themeContext";
+import { useAuth } from "@/hooks/useAuth";
 import { ThemeColor } from "@/types/themecolor";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 export default function Add() {
   const { theme } = useTheme();
   const styles = customStyle(theme);
+  const { user, setLoading, setErr } = useAuth();
   const [vote, setVote] = useState<number>(5);
+  const [comment, setComment] = useState<string>("");
 
-  useEffect(() => {
-    console.log(vote);
-  }, [vote]);
+  const saveVote = () => {
+    setLoading(true);
+
+    saveMood(vote, user?.id!)
+      .then((idMood) => {
+        saveComment(idMood, comment, user?.id!);
+      })
+      .catch((error) => {
+        console.error(error);
+        setErr(error.message());
+      })
+      .finally(() => setLoading(false));
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      //buttoms to vote
+    <KeyboardAwareScrollView
+      style={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
+      {/* //buttoms to vote */}
+      {/* FIXME: change buttoms with slider */}
+
+      <Text style={styles.subtitle}>
+        How much happy are you in this moment?
+      </Text>
       <View style={styles.voteContainer}>
         {Array.from({ length: 5 }, (_, index) => (
           <Pressable
             key={index}
             onPress={() => setVote(index + 1)}
-            style={styles.voteButton}
+            style={[
+              styles.voteButton,
+              vote == index + 1
+                ? { backgroundColor: theme.placeholder }
+                : { backgroundColor: theme.background },
+            ]}
           >
             <Text style={styles.voteText}>{(index + 1).toString()}</Text>
           </Pressable>
@@ -33,7 +60,12 @@ export default function Add() {
           <Pressable
             key={index}
             onPress={() => setVote(index + 6)}
-            style={styles.voteButton}
+            style={[
+              styles.voteButton,
+              vote == index + 6
+                ? { backgroundColor: theme.placeholder }
+                : { backgroundColor: theme.background },
+            ]}
           >
             <Text style={styles.voteText}>{(index + 6).toString()}</Text>
           </Pressable>
@@ -48,15 +80,16 @@ export default function Add() {
           placeholder="Write everything you want..."
           placeholderTextColor={theme.placeholder}
           cursorColor={theme.text}
+          onChangeText={setComment}
         />
       </View>
       <CustomButtons
         textButton="Save"
-        onPressAction={() => console.log("save")}
+        onPressAction={saveVote}
         theme={theme}
         style={{ width: "40%" }}
       />
-    </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 }
 

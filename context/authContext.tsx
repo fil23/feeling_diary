@@ -13,6 +13,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => void;
   signInWithGoogle: () => void;
   err: string | null;
+  setErr: (s: string) => void;
   loading: boolean;
   setLoading: (l: boolean) => void;
 }
@@ -194,6 +195,7 @@ export const AuthProvider = ({ children }: Props) => {
         signIn,
         signInWithGoogle,
         err,
+        setErr,
         loading,
         setLoading,
       }}
