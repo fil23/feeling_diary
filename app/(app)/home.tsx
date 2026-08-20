@@ -50,6 +50,7 @@ export default function Home() {
 
   const handleToday = useMemo(() => {
     if (!todayMoods) return;
+    let tot = 0;
     todayMoods.map((item: DataMood) => {
       const value = item.mood_vote;
       const date = new Date(item.created_at);
@@ -57,9 +58,11 @@ export default function Home() {
       const ex = todayData.find((data) => data.label === l);
       if (ex) {
         ex.find++;
-        ex.value = Math.floor((ex.value + value) / ex.find);
+        tot += value;
+        ex.value = Math.floor(tot / ex.find);
       } else {
         todayData.push({ value, label: l, find: 1 });
+        tot = value;
       }
     });
   }, [, todayMoods]);
@@ -97,13 +100,15 @@ export default function Home() {
           <Text style={styles.subtitle}> Comments of the day </Text>
 
           {todayComments.map((comment: Comment, i: number) => {
-            const d = new Date(comment.created_at);
-            return (
-              <View key={i} style={styles.commentContainer}>
-                <Text style={styles.subcomment}>{d.toLocaleString()}</Text>
-                <Text style={styles.comment}>{comment.comment}</Text>
-              </View>
-            );
+            if (comment.comment != "") {
+              const d = new Date(comment.created_at);
+              return (
+                <View key={i} style={styles.commentContainer}>
+                  <Text style={styles.subcomment}>{d.toLocaleString()}</Text>
+                  <Text style={styles.comment}>{comment.comment}</Text>
+                </View>
+              );
+            }
           })}
         </View>
         {/* action button */}

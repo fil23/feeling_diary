@@ -19,7 +19,7 @@ export default function Add() {
 
     saveMood(vote, user?.id!)
       .then((idMood) => {
-        saveComment(idMood, comment, user?.id!);
+        if (comment != "") saveComment(idMood, comment, user?.id!);
       })
       .catch((error) => {
         console.error(error);
