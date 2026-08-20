@@ -53,7 +53,7 @@ export default function Home() {
     todayMoods.map((item: DataMood) => {
       const value = item.mood_vote;
       const date = new Date(item.created_at);
-      let l = date.getHours().toString();
+      let l = date.getHours().toString().concat(":00");
       const ex = todayData.find((data) => data.label === l);
       if (ex) {
         ex.find++;
@@ -62,7 +62,7 @@ export default function Home() {
         todayData.push({ value, label: l, find: 1 });
       }
     });
-  }, [todayMoods]);
+  }, [, todayMoods]);
 
   if (loading) {
     return <CustomCircularProgress />;
@@ -79,6 +79,7 @@ export default function Home() {
             xAxisColor={theme.text}
             yAxisColor={theme.text}
             frontColor={theme.text}
+            trimYAxisAtTop
             adjustToWidth={true}
             allowFontScaling={true}
             color={theme.text}
@@ -99,7 +100,7 @@ export default function Home() {
             const d = new Date(comment.created_at);
             return (
               <View key={i} style={styles.commentContainer}>
-                <Text style={styles.subcomment}>{d.toDateString()}</Text>
+                <Text style={styles.subcomment}>{d.toLocaleString()}</Text>
                 <Text style={styles.comment}>{comment.comment}</Text>
               </View>
             );
@@ -133,6 +134,7 @@ const customStyles = (theme: ThemeColor) =>
     },
     commentContainer: {
       marginLeft: 10,
+      paddingBottom: 10,
     },
     subcomment: {
       color: theme.shadow,

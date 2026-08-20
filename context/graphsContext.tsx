@@ -37,8 +37,6 @@ export const GraphProvider = ({ children }: Props) => {
       if (error) {
         throw error;
       }
-
-      console.log("Mood votes: " + data);
       setTodayMoods(data ?? []);
     } catch (e: any) {
       setError("something went wrong");
