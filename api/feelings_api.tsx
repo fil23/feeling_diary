@@ -21,3 +21,22 @@ export async function saveComment(
 
   if (error) throw new Error("Error during the commment creation");
 }
+
+export async function saveDisable() {
+  let startHour = new Date();
+  startHour.setHours(startHour.getHours(), 0, 0, 0);
+
+  let finishHour = new Date();
+  finishHour.setHours(startHour.getHours(), 59, 59, 59);
+  console.log(finishHour.toUTCString());
+  console.log(startHour.toUTCString());
+  const { count, error } = await supabase
+    .from("moods")
+    .select("*", { count: "exact", head: true })
+    .gte("created_at", startHour.toISOString())
+    .lte("created_at", finishHour.toISOString());
+
+  if (error) throw new Error("Count errato");
+  console.log(count);
+  return count;
+}

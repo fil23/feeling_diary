@@ -1,9 +1,9 @@
-import { saveComment, saveMood } from "@/api/feelings_api";
+import { saveComment, saveDisable, saveMood } from "@/api/feelings_api";
 import { CustomButtons } from "@/components/buttons/customButton";
 import { useTheme } from "@/context/themeContext";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeColor } from "@/types/themecolor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
@@ -13,6 +13,7 @@ export default function Add() {
   const { user, setLoading, setErr } = useAuth();
   const [vote, setVote] = useState<number>(5);
   const [comment, setComment] = useState<string>("");
+  const [saveDis, setSaveDis] = useState<boolean>(false);
 
   const saveVote = () => {
     setLoading(true);
@@ -25,8 +26,18 @@ export default function Add() {
         console.error(error);
         setErr(error.message());
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   };
+
+  useEffect(() => {
+    saveDisable().then((count) => {
+      if (count != null && count >= 3) setSaveDis(true);
+      else if (count == null) setSaveDis(true);
+      else setSaveDis(false);
+    });
+  }, []);
 
   return (
     <KeyboardAwareScrollView
@@ -88,7 +99,15 @@ export default function Add() {
         onPressAction={saveVote}
         theme={theme}
         style={{ width: "40%" }}
+        disabled={saveDis}
       />
+      {saveDis && (
+        <View>
+          <Text style={styles.infoText}>
+            You have reached the maximum request limit in this hour{" "}
+          </Text>
+        </View>
+      )}
     </KeyboardAwareScrollView>
   );
 }
@@ -99,6 +118,7 @@ const customStyle = (theme: ThemeColor) =>
       flex: 1,
       backgroundColor: theme.background,
       paddingHorizontal: 10,
+      paddingVertical: 20,
     },
     subtitle: {
       color: theme.text,
@@ -116,15 +136,15 @@ const customStyle = (theme: ThemeColor) =>
     voteButton: {
       borderWidth: 2,
       borderColor: theme.border,
-      minWidth: 55,
+      minWidth: 50,
       padding: 10,
       borderRadius: 10,
     },
     voteText: {
       color: theme.text,
       textAlign: "center",
-      fontSize: 30,
-      fontFamily: "Pixelify-Bold",
+      fontSize: 25,
+      fontFamily: "SpaceMono",
     },
     areaText: {
       borderWidth: 1,
@@ -135,6 +155,10 @@ const customStyle = (theme: ThemeColor) =>
       paddingHorizontal: 5,
       paddingVertical: 5,
       fontSize: 16,
+      fontFamily: "SpaceMono",
+    },
+    infoText: {
+      color: theme.text,
       fontFamily: "SpaceMono",
     },
   });

@@ -25,6 +25,7 @@ export const GraphProvider = ({ children }: Props) => {
 
   const getTodayMoods = async (user_id: string) => {
     setLoading(true);
+    setError(null);
     const mid = new Date(new Date());
     mid.setHours(0, 0, 0, 0);
     try {
@@ -49,6 +50,7 @@ export const GraphProvider = ({ children }: Props) => {
 
   const getTodayComments = async (user_id: string) => {
     setLoading(true);
+    setError(null);
     const mid = new Date(new Date());
     mid.setHours(0, 0, 0, 0);
     try {
@@ -61,12 +63,6 @@ export const GraphProvider = ({ children }: Props) => {
       if (error) {
         throw error;
       }
-
-      if (data.length == 0) {
-        setError("I didn't find anything!");
-        return;
-      }
-
       console.log("Comments: " + data);
       setTodayComments(data ?? []);
     } catch (error) {
